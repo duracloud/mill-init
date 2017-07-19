@@ -60,6 +60,7 @@ apt_reboot_if_required: True
 
 # Install additional packages on first boot
 packages:
+ - nfs-common # for using AWS EFS
  - wget
  - htop 
  - git
@@ -73,6 +74,10 @@ packages:
 # runcmd contains a list of either lists or a string
 # each item will be executed in order
 runcmd:
+ - mkdir -p /efs
+ - echo "${efsDnsName}:/ /efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0" >> /etc/fstab
+ - mount -a -t nfs4
+ - mkdir /efs/$INSTANCE_ID
  # Tell sudo to respect SSH Agent forwarding
  - [sh, -c, "umask 0226; echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' > /etc/sudoers.d/ssh-auth-sock"]
  # Install AWS CLI
@@ -116,12 +121,14 @@ cd /etc/puppet && HOME=/root librarian-puppet install
 mkdir -p /etc/facter/facts.d
 cat << 'EOF' > /etc/facter/facts.d/duracloud-mill
 #!/usr/bin/env python
+import subprocess 
+
 data = {
     "dc_mill_node_type":"${nodeType}", # 'dup-producer', 'bit-producer' ,'worker', 'storage-stats', or 'sentinel'
     "dc_mill_log_level":"INFO",
-    "dc_mill_config_file":"${workdir}/mill-config.properties",
+    "dc_mill_config_file":"/home/duracloud/mill-config.properties",
     "dc_mill_version":"${jarVersion}",
-    "dc_workman_tmpdir":"${workdir}",
+    "dc_workman_tmpdir":"/efs/" + subprocess.check_output('hostname').rstrip(),
     "release_mode":"${release_mode}",
     "sumo_access_id":"${sumo_access_id}",
     "sumo_access_key":"${sumo_access_key}",
@@ -133,7 +140,7 @@ EOF
 chmod +x /etc/facter/facts.d/duracloud-mill
 
 # create mill config file
-millConfigFile=${workdir}/mill-config.properties
+millConfigFile=/home/duracloud//mill-config.properties
 millConfigDir="$(dirname $millConfigFile)"
 mkdir -p $millConfigDir
 
@@ -141,6 +148,9 @@ cat << 'EOF' > $millConfigFile
 #MILL_CONFIG
 EOF
 
+# add the workdir 
+echo "workdir=/efs/`hostname`" >> $millConfigFile
+echo "global.workdir=/efs" >> $millConfigFile
 
 # create bit inclusion list
 bitInclusionDir="$(dirname ${looping.bit.inclusion-list-file})"
@@ -190,6 +200,7 @@ chown -R duracloud:duracloud $bitInclusionDir
 chown -R duracloud:duracloud $bitExclusionDir
 chown -R duracloud:duracloud $storageStatsInclusionDir
 chown -R duracloud:duracloud $storageStatsExclusionDir
+chown -R duracloud:duracloud /efs/
 
 
 --===============2205584129673038508==--
