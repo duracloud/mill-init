@@ -77,7 +77,7 @@ runcmd:
  - mkdir -p /efs
  - echo "${efsDnsName}:/ /efs nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 0 0" >> /etc/fstab
  - mount -a -t nfs4
- - mkdir /efs/$INSTANCE_ID
+ - mkdir -p ${workdir} 
  # Tell sudo to respect SSH Agent forwarding
  - [sh, -c, "umask 0226; echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' > /etc/sudoers.d/ssh-auth-sock"]
  # Install AWS CLI
@@ -128,7 +128,7 @@ data = {
     "dc_mill_log_level":"INFO",
     "dc_mill_config_file":"/home/duracloud/mill-config.properties",
     "dc_mill_version":"${jarVersion}",
-    "dc_workman_tmpdir":"/efs/" + subprocess.check_output('hostname').rstrip(),
+    "dc_workman_tmpdir":"${workdir}",
     "release_mode":"${release_mode}",
     "sumo_access_id":"${sumo_access_id}",
     "sumo_access_key":"${sumo_access_key}",
@@ -197,6 +197,7 @@ chown -R duracloud:duracloud $bitExclusionDir
 chown -R duracloud:duracloud $storageStatsInclusionDir
 chown -R duracloud:duracloud $storageStatsExclusionDir
 chown -R duracloud:duracloud /efs/
+chown -R duracloud:duracloud ${workdir}
 
 
 --===============2205584129673038508==--
