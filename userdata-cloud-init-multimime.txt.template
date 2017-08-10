@@ -148,10 +148,6 @@ cat << 'EOF' > $millConfigFile
 #MILL_CONFIG
 EOF
 
-# add the workdir 
-echo "workdir=/efs/`hostname`" >> $millConfigFile
-echo "global.workdir=/efs" >> $millConfigFile
-
 # create bit inclusion list
 bitInclusionDir="$(dirname ${looping.bit.inclusion-list-file})"
 mkdir -p $bitInclusionDir
