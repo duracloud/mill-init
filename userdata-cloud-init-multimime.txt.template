@@ -181,11 +181,12 @@ cat << 'EOF' > ${looping.storagestats.exclusion-list-file}
 #STORAGE_STATS_EXCLUSIONS
 EOF
 
-#copy sumo.json.erb file into place
-# this is a minor hack to be removed once the 
-# the proper sumo module way of doing things is worked out.
-mkdir -p /etc/puppet/modules/sumo/templates
-cp /etc/puppet/sumo/duracloud_sources.json.erb /etc/puppet/modules/sumo/templates/sumo.json.erb
+#copy sumo.json file into place
+# I'm unable to get SumoLogic/sumologic-collector-puppet-module to respect the 
+# path to the sources json file in puppet-duracloud-mill.  So the following
+# file copy put the file where sumo expects it. 
+mkdir -p /usr/local/sumo
+cp /etc/puppet/sumo/duracloud_sources.json /usr/local/sumo/sources.json
 
 # Run puppet
 puppet apply /etc/puppet/manifests/site.pp
