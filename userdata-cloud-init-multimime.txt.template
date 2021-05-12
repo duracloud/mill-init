@@ -68,7 +68,7 @@ packages:
  - puppet
  - ruby # Used to install librarian-puppet
  - ruby-dev
- - python3-pip # Used to install awscli
+ - unzip
 
 # run commands
 # runcmd contains a list of either lists or a string
@@ -81,8 +81,9 @@ runcmd:
  # Tell sudo to respect SSH Agent forwarding
  - [sh, -c, "umask 0226; echo 'Defaults env_keep += \"SSH_AUTH_SOCK\"' > /etc/sudoers.d/ssh-auth-sock"]
  # Install AWS CLI
- - pip3 install typing 
- - pip3 install awscli
+ - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+ - unzip awscliv2.zip
+ - ./aws/install
  # Install librarian-puppet for retrieving dependent puppet modules from github (>1.0.3 requires >=Ruby 1.9)
  - gem install highline --version 1.6.1
  - gem install json --version 1.8.3
