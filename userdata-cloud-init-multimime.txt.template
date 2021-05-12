@@ -69,6 +69,7 @@ packages:
  - ruby # Used to install librarian-puppet
  - ruby-dev
  - unzip
+ - make
 
 # run commands
 # runcmd contains a list of either lists or a string
