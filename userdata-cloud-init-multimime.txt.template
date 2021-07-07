@@ -20,6 +20,7 @@ manage_etc_hosts: false
 bootcmd:
  - cloud-init-per instance my_set_hostname sh -xc "echo ${instancePrefix}-${nodeType}-$INSTANCE_ID > /etc/hostname; hostname -F /etc/hostname"
  - cloud-init-per instance my_etc_hosts sh -xc "sed -i -e '/^127.0.1.1/d' /etc/hosts; echo 127.0.1.1 ${instancePrefix}-${nodeType}-$INSTANCE_ID.${instanceDomain} ${instancePrefix}-${nodeType}-$INSTANCE_ID >> /etc/hosts"
+ - cloud-init-per instance my_get_missing_key sh -xc "sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4528B6CD9E61EF26"
 
 # make user-data scripts always run on boot
 cloud_final_modules:
